@@ -62,28 +62,38 @@ class notificationController extends notification
 		$oNotificationModel = &getModel('notification');
 
 		// search from member data fields
+		$phone_number = array();
 		if(isset($config->cellphone_fieldname) && $member_info)
 		{
-			return $oNotificationModel->getConfigValue($member_info, $config->cellphone_fieldname, 'tel');
+			$phone_number['member'] = $oNotificationModel->getConfigValue($member_info, $config->cellphone_fieldname, 'tel');
 		}
 
 		// search from authentication module table.
 		if($config->use_authdata=='Y' && $member_info)
 		{
-			return $this->getRecipientNumberFromAuthentication($member_info->member_srl);
+			$phone_number['auth'] = $this->getRecipientNumberFromAuthentication($member_info->member_srl);
 		}
 
 		// search from document's extra vars
-		debugPrint($config);
+
 		if($config->use_extravar)
 		{
 			$return_value = $oDocument->getExtraValue($config->use_extravar);
-			debugPrint($return_value);
-			if (is_array($return_value)) $return_value = implode($return_value);
-			return $return_value;
+			$phone_num = explode('|@|',$return_value);
+			if(is_array($phone_num))
+			{
+				$phone_number['use_extravar'] = $phone_num[0].$phone_num[1].$phone_num[2];
+			}
+			else if(is_array($phone_num) && count($phone_num) === 1)
+			{
+				$phone_number['use_extravar'] = $phone_num[0];
+			}
+			else
+			{
+				$phone_number['use_extravar'] = $phone_num;
+			}
 		}
-
-		return NULL;
+		return $phone_number;
 	}
 
 	/**
@@ -363,7 +373,7 @@ class notificationController extends notification
 		// get member_info
 		$member_info = $oMemberModel->getMemberInfoByMemberSrl($writer_member_srl);
 
-		$recipientNumber = $this->getRecipientNumberForWriter($member_info, $oDocument, $config);
+		$recipientNumberArray = $this->getRecipientNumberForWriter($member_info, $oDocument, $config);
 		$senderNumber = $config->sender_phone;
 		$recipientEmailAddress = $this->getEmailAddressForWriter($member_info, $oDocument, $config);
 		$recipientName = $this->getWriterNickName($member_info, $oDocument);
@@ -378,10 +388,20 @@ class notificationController extends notification
 		$tmpObj->article_url = getFullUrl('','document_srl', $commentInfo->document_srl);
 		$tmpContent = $this->mergeKeywords($mailContent, $tmpObj);
 		$tmpMessage = $this->mergeKeywords($mobileContent, $tmpObj);
-
-		$this->sendMessages($recipientNumber, $senderNumber
-							, $recipientEmailAddress, $recipientName, $senderEmailAddress, $senderName
-							, $tmpMessage, $tmpContent, $title, $config, $commentInfo);
+		if(count($recipientNumberArray) > 0)
+		{
+			if(count($recipientNumberArray) >= 2 && $config->frist_number !== 'notuse' && $config->frist_number)
+			{
+				$this->sendMessages($recipientNumberArray[$config->frist_number], $senderNumber, $recipientEmailAddress, $recipientName, $senderEmailAddress, $senderName, $tmpMessage, $tmpContent, $title, $config, $commentInfo);
+			}
+			else
+			{
+				foreach($recipientNumberArray as $number)
+				{
+					$this->sendMessages($number, $senderNumber, $recipientEmailAddress, $recipientName, $senderEmailAddress, $senderName, $tmpMessage, $tmpContent, $title, $config, $commentInfo);
+				}
+			}
+		}
 	}
 
 	/**

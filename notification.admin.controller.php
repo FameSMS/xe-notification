@@ -34,7 +34,7 @@
 		 **/
 		function procNotificationAdminInsert() {
 			$params = Context::gets('content','mail_content','module_srls','msgtype','sending_method','cellphone_fieldname','use_authdata');
-			$extra_vars = new StdClass();
+			$extra_vars = new stdClass();
 			$extra_vars->sender_phone = Context::get('sender_phone');
 			$extra_vars->admin_phones = Context::get('admin_phones');
 			$extra_vars->admin_emails = Context::get('admin_emails');
@@ -49,10 +49,12 @@
 			$extra_vars->sms_method = Context::get('sms_method');
 			$extra_vars->sender_key = Context::get('sender_key');
 			$extra_vars->template_code = Context::get('template_code');
+			$extra_vars->frist_number = Context::get('frist_number');
 			$params->notification_srl = Context::get('noti_srl');
 
 			if ($params->notification_srl) {
 				// delete existences
+				$args = new stdClass();
 				$args->notification_srl = $params->notification_srl;
 				$output = executeQuery('notification.deleteNotiCom', $args);
 				if (!$output->toBool()) return $output;
@@ -66,7 +68,7 @@
 			// insert module srls
 			$module_srls = explode(',', $params->module_srls);
 			foreach ($module_srls as $srl) {
-				unset($args);
+				$args = new stdClass();
 				$args->notification_srl = $params->notification_srl;
 				$args->module_srl = $srl;
 				$output = executeQuery('notification.insertNotificationModuleSrl', $args);

@@ -176,6 +176,19 @@
 				<p id="about_use_authdata_help" class="x_help-block" hidden>인증모듈에 의해 인증받은 전화번호를 수신번호로 사용합니다.</p>
 			</div>
 		</div>
+
+		<div class="x_control-group">
+			<label class="x_control-label">우선순위 전화번호</label>
+			<div class="x_controls">
+				<label class="x_inline" for="frist_number_member"><input type="radio" name="frist_number" id="frist_number_member" value="member" checked="checked"|cond="$notification_info->frist_number=='member'" />회원정보 전화번호</label>
+				<label class="x_inline" for="frist_number_use_extravar"><input type="radio" name="frist_number" id="frist_number_use_extravar" value="use_extravar" checked="checked"|cond="$notification_info->frist_number=='use_extravar'" />확장변수 전화번호</label>
+				<label class="x_inline" for="frist_number_auth"><input type="radio" name="frist_number" id="frist_number_auth" value="auth" checked="checked"|cond="$notification_info->frist_number=='auth'" />인증모듈의 전화번호</label>
+				<label class="x_inline" for="frist_number_notuse"><input type="radio" name="frist_number" id="frist_number_notuse" value="notuse" checked="checked"|cond="!$notification_info->frist_number || $notification_info->frist_number=='notuse'" />인증모듈의 전화번호</label>
+				<a href="#about_frist_number_help" class="x_icon-question-sign" data-toggle>{$lang->help}</a>
+				<p id="about_frist_number_help" class="x_help-block" hidden>우선적으로 1개를 필수로 문자 보낼려고 할 경우 위 옵션을 사용하세요.</p>
+			</div>
+		</div>
+
 		<div class="x_control-group">
 			<label class="x_control-label">게시판 확장변수 연동(핸드폰)</label>
 			<div class="x_controls">
