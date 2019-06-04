@@ -79,18 +79,17 @@ class notificationController extends notification
 		if($config->use_extravar)
 		{
 			$return_value = $oDocument->getExtraValue($config->use_extravar);
-			$phone_num = explode('|@|',$return_value);
-			if(is_array($phone_num))
+			if(is_array($return_value))
 			{
-				$phone_number['use_extravar'] = $phone_num[0].$phone_num[1].$phone_num[2];
+				$phone_number['use_extravar'] = $return_value[0].$return_value[1].$return_value[2];
 			}
-			else if(is_array($phone_num) && count($phone_num) === 1)
+			else if(is_array($return_value) && count($return_value) === 1)
 			{
-				$phone_number['use_extravar'] = $phone_num[0];
+				$phone_number['use_extravar'] = $return_value[0];
 			}
 			else
 			{
-				$phone_number['use_extravar'] = $phone_num;
+				$phone_number['use_extravar'] = $return_value;
 			}
 		}
 		return $phone_number;
